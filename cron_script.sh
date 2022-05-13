@@ -24,8 +24,9 @@ function get_current_ts()
 
 function prohibit_email()
 {
-	# everything shall be included into that single function
-	# FALSE if no
+	# Commands: "ok", "fail"
+	#  "ok":   reset and write status OK to state file
+	#  "fail": write file if not exist
 	# check whether state file exist
 	# if there is a state file:
 	#   read && when DIFF > periodicity => return FALSE
@@ -39,7 +40,7 @@ function prohibit_email()
 		if ! [ -e "${SIGNAL_FILE}" ]; then
 			# state is unknown, create a file
 			echo "FAILED:$(date +%s)" > "${SIGNAL_FILE}"
-			return 0
+			return 1
 		else
 			# file exists, compute DIFF and compare with PERIODICITY
 			TS_NOW=$(date +%s)
