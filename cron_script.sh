@@ -3,49 +3,80 @@
 # provide bash code that helps to filter the state
 # of a crontab when executed very frequently
 
+# we assume that when this function is called
+# no file 		=> UNKNOWN STATE
+# file exists 	=> STATE=OK, change to FAIL,
+
+set -ex
+
+STATE_UNKNOWN="UNKNOWN"
+STATE_FAIL="FAIL"
+STATE_PERIODICITY_SEC=60
+TEST_FILE="./test.me"
 
 SIGNAL_FILE="/tmp/${0}.cron"
-STATE="UNKNOWN"
+STATE="${STATE_UNKNOWN}"
 
 function get_current_ts()
 {
-	local TS1
-	TS1=$(date +%s)
-	echo $TS1
+	echo $(date +%s)
 }
 
-function get_state_file()
+function prohibit_email()
 {
-	# read state file and parse the content
-	local CONT=$(cat ${SIGNAL_FILE})
-}
-
-
-function test_signal_file()
-{
-	local _file="$1"
-	return test -e "${_file}"
-}
-
-
-while true; do
-	if test_signal_file ./signal_file.txt; then
-		echo "found file, state OK"
-	else
-		echo "not found, state FAILED"
-		break
+	# everything shall be included into that single function
+	# FALSE if no
+	# check whether state file exist
+	# if there is a state file:
+	#   read && when DIFF > periodicity => return FALSE
+	#   else return FALSE
+	# elif there is no FILE:
+	#   create a file and return
+	local CMD="${1}"
+	if [[ $CMD == "ok" ]]; then
+		echo "OK" > "${SIGNAL_FILE}"
+	elif [[ $CMD == "fail" ]]; then
+		if ! [ -e "${SIGNAL_FILE}" ]; then
+			# state is unknown, create a file
+			echo "FAILED:$(date +%s)" > "${SIGNAL_FILE}"
+			return 0
+		else
+			# file exists, compute DIFF and compare with PERIODICITY
+			TS_NOW=$(date +%s)
+			STATE=$(cat ${SIGNAL_FILE} | cut -d ':' -f1)
+			if [[ "OK" == "$STATE" ]]; then
+				echo "FAILED:$(date +%s)" > ${SIGNAL_FILE}
+				return 0
+			elif [[ "FAILED" == "${STATE}" ]]; then
+				TS_OLD=$(cat $SIGNAL_FILE | cut -d ':' -f2)
+				DIFF=$(( TS_NOW - TS_OLD ))
+				if [ $DIFF -gt 180 ]; then
+					echo "FAILED:$(date +%s)" > "${SIGNAL_FILE}"
+					return 1
+				else
+					return 0
+				fi
+			else
+				echo "invalid state, not supported"
+			fi
+		fi
 	fi
-done
+	return 1
+}
+
+function send_email()
+{
+	echo "SMTP: email sent"
+}
 
 
-TS1=$(get_current_ts)
-
-# format, 10:1652453349:FAILED
-
-TS2=$(get_current_ts)
-echo $TS1 > $SIGNAL_FILE
-
-DIFF=$(( TS2 - TS1 ))
-echo "diff: $DIFF"
+if ! [ -e $TEST_FILE ]; then
+	if ! prohibit_email "fail"; then
+		send_email
+		exit 1
+	fi
+else
+	prohibit_email "ok"
+fi
 
 exit 0
