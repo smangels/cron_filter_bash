@@ -7,14 +7,8 @@
 # no file 		=> UNKNOWN STATE
 # file exists 	=> STATE=OK, change to FAIL,
 
-set -ex
+#set -ex
 
-STATE_UNKNOWN="UNKNOWN"
-STATE_FAIL="FAIL"
-STATE_PERIODICITY_SEC=60
-TEST_FILE="./test.me"
-
-SIGNAL_FILE="/tmp/${0}.cron"
 STATE="${STATE_UNKNOWN}"
 
 function get_current_ts()
@@ -33,26 +27,30 @@ function prohibit_email()
 	#   else return FALSE
 	# elif there is no FILE:
 	#   create a file and return
+	local SIGNAL_FILE="/tmp/${0}.cron"
 	local CMD="${1}"
+	local TS_NOW=$(date +%s)
+	local PERIODICITY=180
 	if [[ $CMD == "ok" ]]; then
-		echo "OK" > "${SIGNAL_FILE}"
+		[ $# > 1 ] && PERIODICITY=$2
+		echo "OK::${PERIODICITY}" > "${SIGNAL_FILE}"
 	elif [[ $CMD == "fail" ]]; then
 		if ! [ -e "${SIGNAL_FILE}" ]; then
 			# state is unknown, create a file
-			echo "FAILED:$(date +%s)" > "${SIGNAL_FILE}"
+			echo "FAILED:${TS_NOW}:${PERIODICITY}" > "${SIGNAL_FILE}"
 			return 1
 		else
 			# file exists, compute DIFF and compare with PERIODICITY
-			TS_NOW=$(date +%s)
 			STATE=$(cat ${SIGNAL_FILE} | cut -d ':' -f1)
 			if [[ "OK" == "$STATE" ]]; then
-				echo "FAILED:$(date +%s)" > ${SIGNAL_FILE}
+				echo "FAILED:${TS_NOW}:${PERIODICITY}" > ${SIGNAL_FILE}
 				return 0
 			elif [[ "FAILED" == "${STATE}" ]]; then
-				TS_OLD=$(cat $SIGNAL_FILE | cut -d ':' -f2)
+				TS_OLD=$(cat "${SIGNAL_FILE}" | cut -d ':' -f2)
+				PERIODICITY=$(cat "${SIGNAL_FILE}" | cut -d ':' -f3)
 				DIFF=$(( TS_NOW - TS_OLD ))
 				if [ $DIFF -gt 180 ]; then
-					echo "FAILED:$(date +%s)" > "${SIGNAL_FILE}"
+					echo "FAILED:${TS_NOW}:${PERIODICITY}" > "${SIGNAL_FILE}"
 					return 1
 				else
 					return 0
@@ -65,19 +63,3 @@ function prohibit_email()
 	return 1
 }
 
-function send_email()
-{
-	echo "SMTP: email sent"
-}
-
-
-if ! [ -e $TEST_FILE ]; then
-	if ! prohibit_email "fail"; then
-		send_email
-		exit 1
-	fi
-else
-	prohibit_email "ok"
-fi
-
-exit 0
