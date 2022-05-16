@@ -87,7 +87,7 @@ function test_case_02()
    rm -f ${STATE_FILE}
 
    # call UUT
-   prohibit_output "unknown command" &> /dev/null || failed ""
+   prohibit_output "unknown command" &> /dev/null && failed ""
 
    passed
    unset TEST_CASE

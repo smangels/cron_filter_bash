@@ -69,7 +69,7 @@ function prohibit_output()
 			if [[ "OK" == ${STATE} ]]; then
             echo "OK => FAILED"
 				echo "FAILED:${TS_NOW}:${PERIODICITY}" > ${SIGNAL_FILE}
-				return 0
+				return 1
 			elif [[ "FAILED" == ${STATE} ]]; then
             echo "FAILED => FAILED"
 				TS_OLD=$(cat "${SIGNAL_FILE}" | cut -d ':' -f2)
@@ -87,7 +87,7 @@ function prohibit_output()
 		fi
 	else
 		echo "UNKNOWN command \"${CMD}\"...."
-		return 0
+		return 1
 	fi
 	return 1
 }
