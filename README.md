@@ -6,11 +6,10 @@ This repository is meant to provide a function that could be sourced so that a s
 # State Machine
 
 ![Alt text](https://g.gravizo.com/source/svg/custom_mark11?https%3A%2F%2Fraw.githubusercontent.com%2Fsmangels%2Fcron_filter_bash%2Fmain%2FREADME.MD)
-
 <details> 
 <summary></summary>
 custom_mark11
-	diagraph G {
+	digraph G {
 		size = "4,4"
 		main [shape=box]
 		UNKNOWN -> OK [weight=8]
