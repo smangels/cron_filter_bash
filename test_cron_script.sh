@@ -186,8 +186,7 @@ function test_case_06()
    return 0
 }
 
-
-
+# HERE STARTS MAIN ###
 echo "Start testing..."
 test_case_01
 test_case_02
