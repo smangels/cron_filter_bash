@@ -6,9 +6,10 @@ This repository is meant to provide a function that could be sourced so that a s
 # State Machine
 
 ![Alt text](https://g.gravizo.com/source/custom_filter_cron?https%3A%2F%2Fraw.githubusercontent.com%2Fsmangels%2Fcron_filter_bash%2Fmain%2FREADME.MD)
+
 <details> 
 <summary></summary>
-custom_filter_cron	
+custom_filter_cron
 @startuml
 start
 :unknown;
@@ -20,7 +21,7 @@ else
 endif
 end
 @enduml
-customer_filter_cron
+custom_filter_cron
 </details>
 
 
