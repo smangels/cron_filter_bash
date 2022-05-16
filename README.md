@@ -27,6 +27,13 @@ custom_mark11
 # Supported features
 
 - filter subsequent FAIL states as long as
+- do not filter when the following transitions are performed
+	- UNKNOWN => FAILED
+	- UNKNOWN => OK
+	- FAILED => OK
+	- OK => FAILED
+- in case of invalid command [^ok|failed], logging shall not be
+  prohibited
 
 # Interface
 
