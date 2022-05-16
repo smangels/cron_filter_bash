@@ -32,7 +32,7 @@ function prohibit_output()
 
 	if [[ ${CMD} == "OK" ]]; then
 
-		[ $# > 1 ] && PERIODICITY=$2
+		[ $# -gt 1 ] && PERIODICITY=$2
 		if ! [ -e  $SIGNAL_FILE ]; then
 			# UNKNOWN state, write state and return FALSE
 			echo "OK::${PERIODICITY}" > "${SIGNAL_FILE}"
