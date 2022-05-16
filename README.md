@@ -7,17 +7,18 @@ This repository is meant to provide a function that could be sourced so that a s
 
 ![Alt text](https://g.gravizo.com/source/svg/custom_mark11?https%3A%2F%2Fraw.githubusercontent.com%2Fsmangels%2Fcron_filter_bash%2Fmain%2FREADME.md)
 <details> 
-<summary></summary>
+<summary>This is a summary</summary>
 custom_mark11
 	digraph G {
 		size = "4,4"
 		main [shape=box]
-		UNKNOWN -> OK [weight=8]
+		UNKNOWN -> OK [label="cmd:OK"]
 		UNKNOWN -> FAILED [label="cmd:FAILED"]
 		OK -> OK [label="cmd:OK"]
 		OK -> FAILED [label="cmd:FAILED"]
 		FAILED -> FAILED [label="cmd:FAILED"]
 		FAILED -> OK [label="cmd:OK"]
+		{rank = same; OK; FAILED;}
 	}
 custom_mark11
 </details>
