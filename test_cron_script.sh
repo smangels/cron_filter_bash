@@ -148,7 +148,7 @@ function test_case_05()
    echo "FAILED:$(expr $TS - 179):180" > ${STATE_FILE}
    prohibit_output "failed" 180 || failed "100 seconds ago, 120s periodicity"
    sleep 2
-   prohibit_output "failed" 180 && failed ""
+   prohibit_output "failed" 180 && failed "> 180 seconds, we expect a go for logging"
 
    passed
    unset TEST_CASE
