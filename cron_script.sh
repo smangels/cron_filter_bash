@@ -42,12 +42,10 @@ function prohibit_output()
          STATE=$(cat ${SIGNAL_FILE} | cut -d ':' -f1)
          if [[ "FAILED" == ${STATE} ]]; then
             # transition from FAILED, state
-            echo "FAILED => OK"
             echo "OK::${PERIODICITY}" > "${SIGNAL_FILE}"
             return 1
          else
             # we are alread in OK state, prohibit output
-            echo "OK => OK"
             echo "OK::${PERIODICITY}" > "${SIGNAL_FILE}"
             return 0
          fi
@@ -57,8 +55,6 @@ function prohibit_output()
 
 		if ! [ -e "${SIGNAL_FILE}" ]; then
 
-         echo "UNKNOWN => FAILED"
-
 			# state is unknown, create a file
 			echo "${CMD}:${TS_NOW}:${PERIODICITY}" > "${SIGNAL_FILE}"
 			return 1
@@ -67,7 +63,6 @@ function prohibit_output()
 			# file exists, compute DIFF and compare with PERIODICITY
 			STATE=$(cat ${SIGNAL_FILE} | cut -d ':' -f1)
 			if [[ "OK" == ${STATE} ]]; then
-            echo "OK => FAILED"
 				echo "FAILED:${TS_NOW}:${PERIODICITY}" > ${SIGNAL_FILE}
 				return 1
 			elif [[ "FAILED" == ${STATE} ]]; then
@@ -82,11 +77,12 @@ function prohibit_output()
 					return 0
 				fi
 			else
-				echo "invalid state, not supported"
+				# something is fishy with the state read from file
+            return 1
 			fi
 		fi
 	else
-		echo "UNKNOWN command \"${CMD}\"...."
+      # command is "unknown", do not prohibit
 		return 1
 	fi
 	return 1
