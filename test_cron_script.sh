@@ -159,6 +159,24 @@ function test_case_05()
 }
 
 
+function test_case_06()
+{
+   # given a test system being in UNKNOWN state (no STATE file)
+   # a failed command is not expected to prohibit logging
+   TEST_CASE=${FUNCNAME[0]}
+
+   # setup, put system in UNKNOWN state
+   rm -f ${STATE_FILE}
+
+   # call UUT
+   prohibit_output "failed" 120 && failed "unknown => failed should result into FALSE"
+
+   passed
+   unset TEST_CASE
+   return 0
+}
+
+
 
 echo "Start testing..."
 test_case_01
@@ -166,5 +184,6 @@ test_case_02
 test_case_03
 test_case_04
 test_case_05
+test_case_06
 echo "ALL TESTS PASSED"
 exit 0
