@@ -26,7 +26,8 @@ custom_mark11
 
 # Supported features
 
-- filter subsequent FAIL states as long as
+- filter subsequent FAIL states as long as not more than
+  X number of seconds have elapsed after last
 - do not filter when the following transitions are performed
 	- UNKNOWN => FAILED
 	- UNKNOWN => OK
@@ -46,7 +47,7 @@ prohibit_output <STATE> <TIME_LIMIT_IN_SECONDS>
 ```sh
 # describe how to source or define a dummy function that always
 # return 1
-if [ -z MY_ENV_VAR ]; then
+if [ -z $MY_ENV_VAR ]; then
   source $FILE_CONTAINING_FUNCTION
 else
 	function prohibit_output()
