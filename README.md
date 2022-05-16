@@ -13,7 +13,7 @@ custom_mark11
 		size = "4,4"
 		main [shape=box]
 		UNKNOWN -> OK [weight=8]
-		UNKNOWN -> FAILED
+		UNKNOWN -> FAILED [label="cmd:FAILED"]
 		OK -> OK [label="cmd:OK"]
 		OK -> FAILED [label="cmd:FAILED"]
 		FAILED -> FAILED [label="cmd:FAILED"]
