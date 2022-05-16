@@ -13,12 +13,6 @@
 
 #set -ex
 
-STATE="${STATE_UNKNOWN}"
-
-function get_current_ts()
-{
-	echo $(date +%s)
-}
 
 function prohibit_output()
 {
