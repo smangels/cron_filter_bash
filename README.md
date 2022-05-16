@@ -10,7 +10,7 @@ This repository is meant to provide a function that could be sourced so that a s
 <summary>This is a summary</summary>
 custom_mark11
 	digraph G {
-		size = "4,4"
+		size = "8,8"
 		main [shape=box]
 		UNKNOWN -> OK [label="cmd:OK"]
 		UNKNOWN -> FAILED [label="cmd:FAILED"]
