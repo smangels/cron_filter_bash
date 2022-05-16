@@ -27,8 +27,8 @@ custom_mark11
 # Supported features
 
 - filter subsequent FAIL states as long as not more than
-  X number of seconds have elapsed after last
-- do not filter when the following transitions are performed
+  X number of seconds have elapsed after last call
+- do not prohibit logging when the following transitions are performed
 	- UNKNOWN => FAILED
 	- UNKNOWN => OK
 	- FAILED => OK
@@ -42,20 +42,27 @@ custom_mark11
 prohibit_output <STATE> <TIME_LIMIT_IN_SECONDS>
 ```
 
+
+# Architecture
+
+The solution is build around writing and reading a temporary file who's name is derived from the name of the script including
+
 # Integration
 
 ```sh
 # describe how to source or define a dummy function that always
 # return 1
-if [ -z $MY_ENV_VAR ]; then
-  source $FILE_CONTAINING_FUNCTION
-else
-	function prohibit_output()
-	{
-		return 1
-	}
-fi
+CRON_ENABLE_FILTERING=1
 
+if [ $CRON_ENABLE_FILTERING -gt 0 ]; then
+   source ./cron_script.sh
+else
+   function prohibit_output()
+   {
+      echo "=> dummy is called"
+      return 1
+   }
+fi
 # call that function
 prohibit_output "failed" 120 || echo "this generates email"
 ```

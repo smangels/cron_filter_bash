@@ -1,5 +1,15 @@
 
-source ./cron_script.sh
+CRON_ENABLE_FILTERING=1
+
+if [ $CRON_ENABLE_FILTERING -gt 0 ]; then
+   source ./cron_script.sh
+else
+   function prohibit_output()
+   {
+      echo "=> dummy is called"
+      return 1
+   }
+fi
 
 TEST_CASE=""
 STATE_FILE="/tmp/${0}.cron"
@@ -60,7 +70,7 @@ function test_case_01()
 
    # assertions
    if ! [ -f ${STATE_FILE} ]; then
-      debug "ERROR: we expected a state file in ${STATE_FILE}"
+      failed "ERROR: we expected a state file in ${STATE_FILE}"
       return 0
    fi
    PERIODICITY=$(get_periodicity)
