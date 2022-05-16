@@ -5,23 +5,22 @@ This repository is meant to provide a function that could be sourced so that a s
 
 # State Machine
 
-![Alt text](https://g.gravizo.com/source/custom_filter_cron?https%3A%2F%2Fraw.githubusercontent.com%2Fsmangels%2Fcron_filter_bash%2Fmain%2FREADME.MD)
+![Alt text](https://g.gravizo.com/source/custom_mark11?https%3A%2F%2Fraw.githubusercontent.com%2Fsmangels%2Fcron_filter_bash%2Fmain%2FREADME.MD)
 
 <details> 
-<summary></summary>
-custom_filter_cron
-@startuml
-start
-:unknown;
--> function call;
-if (result?) is (<color:red>ok) then
-:OK;
-else 
-:FAILED;
-endif
-end
-@enduml
-custom_filter_cron
+<summary>Finite State Machine for CRON filter</summary>
+custom_mark11
+	diagraph G {
+		size = "4,4"
+		main [shape=box]
+		UNKNOWN -> OK [weight=8]
+		UNKNOWN -> FAILED
+		OK -> OK [label="cmd:OK"]
+		OK -> FAILED [label="cmd:FAILED"]
+		FAILED -> FAILED [label="cmd:FAILED"]
+		FAILED -> OK [label="cmd:OK"]
+	}
+custom_mark11
 </details>
 
 
