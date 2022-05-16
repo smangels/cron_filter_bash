@@ -119,7 +119,7 @@ function test_case_04()
    TEST_CASE=${FUNCNAME[0]}
 
    # setup
-   # create a fake file with FAILED state
+   # given the system being in FAILED state
    # send FAILED state, expected TRUE
    # send OK state, expected FALSE
    # send OK state, expected TRUE
