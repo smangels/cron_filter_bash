@@ -136,6 +136,25 @@ function test_case_04()
    return 0
 }
 
+function test_case_05()
+{
+   # given a the system being in a FAILED state, multiple
+   # messages within PERIODICITY are being ignored and
+   # logging is prohibited
+   TEST_CASE=${FUNCNAME[0]}
+
+   # setup, generate STATE_FILE and fake the timestamp
+   local TS=$(date +%s)
+   echo "FAILED:$(expr $TS - 179):180" > ${STATE_FILE}
+   prohibit_output "failed" 180 || failed "100 seconds ago, 120s periodicity"
+   sleep 2
+   prohibit_output "failed" 180 && failed ""
+
+   passed
+   unset TEST_CASE
+   return 0
+}
+
 
 
 echo "Start testing..."
@@ -143,5 +162,6 @@ test_case_01
 test_case_02
 test_case_03
 test_case_04
+test_case_05
 echo "ALL TESTS PASSED"
 exit 0

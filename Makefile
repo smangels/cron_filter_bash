@@ -1,7 +1,7 @@
 
 all: test
 
-test: testme.sh cron_script.sh
+test: test_cron_script.sh cron_script.sh
 	@bash $<
 
 .PHONY: clean
