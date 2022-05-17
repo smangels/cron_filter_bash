@@ -37,8 +37,8 @@ function prohibit_output()
 		PERIODICITY=$2
 
 		if [ -f  $SIGNAL_FILE ]; then
-			local TS_OLD=$(cat "${SIGNAL_FILE}" | cut -d ':' -f2)
-			local STATE=$(cat "${SIGNAL_FILE}" | cut -d ':' -f1)
+			TS_OLD=$(cat "${SIGNAL_FILE}" | cut -d ':' -f2)
+			STATE=$(cat "${SIGNAL_FILE}" | cut -d ':' -f1)
 			echo "${STATE}:${TS_OLD}:${PERIODICITY}" > "${SIGNAL_FILE}"
 		else
 			echo "UNKNOWN:${TS_NOW}:${PERIODICITY}" > "${SIGNAL_FILE}"
