@@ -28,6 +28,9 @@ function prohibit_output()
 	local SIGNAL_FILE="/tmp/${0}.cron"
 	local CMD="${1^^}"
 	local TS_NOW=$(date +%s)
+	local TS_OLD=0
+	local DIFF
+	local STATE=""
 	local PERIODICITY=180
 
 	if [[ ${CMD} == "OK" ]]; then
