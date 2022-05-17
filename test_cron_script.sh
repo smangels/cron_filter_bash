@@ -192,6 +192,65 @@ function test_case_06()
    return 0
 }
 
+function test_case_07()
+{
+   # given a system in UNKNOWN state, running INIT create a STATE
+   # file that contains UNKNOWN:TS:PERIODICITY
+   TEST_CASE=${FUNCNAME[0]}
+   local EXP_PERIODICITY=777
+
+   # setup
+   rm -f $STATE_FILE
+
+   # call UUT
+   prohibit_output "init" EXP_PERIODICITY
+
+   # assertions
+   NEW_STATE=$(get_state)
+   NEW_PERIOD=$(get_periodicity)
+   [[ $NEW_STATE != "UNKNOWN" ]] && \
+      failed "expected UNKNOWN, received ${NEW_STATE}"
+   [[ $NEW_PERIOD -ne $EXP_PERIODICITY ]] && \
+      failed "unexpected periodicity of ${NEW_PERIOD}"
+
+   passed
+   unset TEST_CASE
+   return 0
+}
+
+function test_case_08()
+{
+   # given an already initiated system (either FAILED or OK), running INIT will update the
+   # STATE file with the new periodicity
+   TEST_CASE=${FUNCNAME[0]}
+   local NEW_TS=$(date +%s)
+   local EXP_PERIODICITY_1=333
+   local EXP_PERIODICITY_2=444
+   local NEW_PERIOD=0
+   local NEW_STATE="BENIFY"
+
+   # setup
+   echo "OK:${NEW_TS}:${EXP_PERIODICITY_1}" > ${STATE_FILE}
+
+   # call UUT
+   prohibit_output "init" ${EXP_PERIODICITY_2}
+
+   # assertions
+   NEW_PERIOD=$(get_periodicity)
+   [[ $NEW_PERIOD -ne $EXP_PERIODICITY_2 ]] && \
+      failed "unexpected periodicity, expected ${EXP_PERIODICITY_2}, received ${NEW_PERIOD}"
+
+   # call UUT
+   prohibit_output "ok"
+   NEW_STATE=$(get_state)
+   [[ $NEW_STATE != "OK" ]] && failed "invalid state, expected OK, received ${NEW_STATE}"
+
+
+   passed
+   unset TEST_CASE
+   return 0
+}
+
 
 
 
@@ -203,5 +262,7 @@ test_case_03
 test_case_04
 test_case_05
 test_case_06
+test_case_07
+test_case_08
 echo "ALL TESTS PASSED"
 exit 0
