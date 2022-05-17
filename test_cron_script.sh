@@ -60,23 +60,27 @@ function test_case_01()
    # given there is no state file in temp, init command
    # creates one and set provided periodicity in seconds
    TEST_CASE=${FUNCNAME[0]}
+   local PERIODICITY=2
 
    # setup
    rm -f $STATE_FILE
 
    # call UUT
-   EXP_PERIODICITY=120
-   prohibit_output "ok" 120
+   EXP_PERIODICITY=140
+   prohibit_output "init" $EXP_PERIODICITY
+   prohibit_output "ok"
 
    # assertions
    if ! [ -f ${STATE_FILE} ]; then
       failed "ERROR: we expected a state file in ${STATE_FILE}"
       return 0
    fi
+
    PERIODICITY=$(get_periodicity)
-   if ! [[ ${PERIODICITY} == ${EXP_PERIODICITY} ]]; then
+   if [[ ${PERIODICITY} != ${EXP_PERIODICITY} ]]; then
       failed "ERROR: we expected PERIODICITY: ${EXP_PERIODICITY}, got ${PERIODICITY}"
    fi
+
    EXP_STATE="OK"
    STATE=$(get_state)
    if ! [[ $STATE == $EXP_STATE ]]; then
@@ -114,8 +118,8 @@ function test_case_03()
    rm -f ${STATE_FILE}
 
    # call UUT, first and second time
-   prohibit_output "ok" 120 && failed "expected 0 received 1"
-   prohibit_output "ok" 120 || failed "expected 1, received 0"
+   prohibit_output "ok" && failed "expected 0 received 1"
+   prohibit_output "ok" || failed "expected 1, received 0"
 
    passed
    unset TEST_CASE
@@ -136,9 +140,9 @@ function test_case_04()
    echo "FAILED:$(date +%s):120" > $STATE_FILE
 
    # call UUT
-   prohibit_output "failed" 120 || failed "final FAILED, expected TRUE, received FALSE"
-   prohibit_output "ok" 120 && failed "first OK, expected FALSE, received TRUE"
-   prohibit_output "ok" 120 || failed "second OK, expected TRUE, received FALSE"
+   prohibit_output "failed" || failed "final FAILED, expected TRUE, received FALSE"
+   prohibit_output "ok" && failed "first OK, expected FALSE, received TRUE"
+   prohibit_output "ok" || failed "second OK, expected TRUE, received FALSE"
 
 
    passed
@@ -153,15 +157,17 @@ function test_case_05()
    # ignored and logging is prohibited, a message after
    # the timer exceeded is no longer prohibited
    TEST_CASE=${FUNCNAME[0]}
+   local EXP_PERIODICITY=666
 
    # setup, generate STATE_FILE and fake the timestamp
+   rm -f ${STATE_FILE}
    local TS=$(date +%s)
-   echo "FAILED:$(expr $TS - 179):180" > ${STATE_FILE}
+   echo "FAILED:$(expr $TS - $EXP_PERIODICITY + 1):${EXP_PERIODICITY}" > ${STATE_FILE}
 
    # call UUT
-   prohibit_output "failed" 180 || failed "100 seconds ago, 120s periodicity"
+   prohibit_output "failed" || failed "100 seconds ago, ${EXP_PERIODICITY}s periodicity"
    sleep 2
-   prohibit_output "failed" 180 && failed "> 180 seconds, we expect a go for logging"
+   prohibit_output "failed" && failed "> ${EXP_PERIODICITY} seconds, we expect a go for logging"
 
    passed
    unset TEST_CASE
@@ -179,12 +185,15 @@ function test_case_06()
    rm -f ${STATE_FILE}
 
    # call UUT
-   prohibit_output "failed" 120 && failed "unknown => failed should result into FALSE"
+   prohibit_output "failed" && failed "unknown => failed should result into FALSE"
 
    passed
    unset TEST_CASE
    return 0
 }
+
+
+
 
 # HERE STARTS MAIN ###
 echo "Start testing..."

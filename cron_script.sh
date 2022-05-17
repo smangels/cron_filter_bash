@@ -31,12 +31,27 @@ function prohibit_output()
 	local TS_OLD=0
 	local DIFF
 	local STATE=""
-	local PERIODICITY=180
+	local PERIODICITY=0
+
+	if [[ ${CMD} == "INIT" ]] & [ $# -gt 1 ]; then
+		PERIODICITY=$2
+
+		if [ -f  $SIGNAL_FILE ]; then
+			local TS_OLD=$(cat "${SIGNAL_FILE}" | cut -d ':' -f2)
+			local STATE=$(cat "${SIGNAL_FILE}" | cut -d ':' -f1)
+			echo "${STATE}:${TS_OLD}:${PERIODICITY}" > "${SIGNAL_FILE}"
+		else
+			echo "UNKNOWN:${TS_NOW}:${PERIODICITY}" > "${SIGNAL_FILE}"
+		fi
+	fi
+
+	if [ -f $SIGNAL_FILE ]; then
+		PERIODICITY=$(cat ${SIGNAL_FILE} | cut -d ':' -f3)
+	fi
 
 	if [[ ${CMD} == "OK" ]]; then
 
-		[ $# -gt 1 ] && PERIODICITY=$2
-		if ! [ -e  $SIGNAL_FILE ]; then
+		if ! [ -f  $SIGNAL_FILE ]; then
 			# UNKNOWN state, write state and return FALSE
 			echo "OK::${PERIODICITY}" > "${SIGNAL_FILE}"
 			return 1
@@ -56,7 +71,7 @@ function prohibit_output()
 
 	elif [[ ${CMD} == "FAILED" ]]; then
 
-		if ! [ -e "${SIGNAL_FILE}" ]; then
+		if ! [ -f "${SIGNAL_FILE}" ]; then
 
 			# state is unknown, create a file
 			echo "${CMD}:${TS_NOW}:${PERIODICITY}" > "${SIGNAL_FILE}"
@@ -65,6 +80,8 @@ function prohibit_output()
 		else
 			# file exists, compute DIFF and compare with PERIODICITY
 			STATE=$(cat ${SIGNAL_FILE} | cut -d ':' -f1)
+			PERIODICITY=$(cat ${SIGNAL_FILE} | cut -d ':' -f1)
+
 			if [[ "OK" == ${STATE} ]]; then
 				echo "FAILED:${TS_NOW}:${PERIODICITY}" > ${SIGNAL_FILE}
 				return 1
@@ -72,7 +89,7 @@ function prohibit_output()
 				TS_OLD=$(cat "${SIGNAL_FILE}" | cut -d ':' -f2)
 				PERIODICITY=$(cat "${SIGNAL_FILE}" | cut -d ':' -f3)
 				DIFF=$(( TS_NOW - TS_OLD ))
-				if [ $DIFF -gt 180 ]; then
+				if [ $DIFF -gt $PERIODICITY ]; then
 					echo "FAILED:${TS_NOW}:${PERIODICITY}" > "${SIGNAL_FILE}"
 					return 1
 				else
